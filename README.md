@@ -2,6 +2,13 @@
 
 This is a library for Temporal Convolutional Networks (TCNs) in PyTorch. It is based on the TCN as described in the paper [An Empirical Evaluation of Generic Convolutional and Recurrent Networks for Sequence Modeling](https://arxiv.org/abs/1803.01271) by Shaojie Bai, J. Zico Kolter and Vladlen Koltun. The code is largely based on the [original PyTorch implementation](https://github.com/locuslab/TCN) from the authors.
 
+Compared to the original code base, the following extra features were added:
+
+- Support for batch normalization or/and weight normalization
+- Possible to disable residual connections
+- Support for ResNeXt blocks
+- Support for depthwise separable convolutions
+
 ## Installation
 
 ```bash
