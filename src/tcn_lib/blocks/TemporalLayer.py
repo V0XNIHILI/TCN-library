@@ -8,8 +8,8 @@ import torch
 import torch.nn as nn
 from torch.nn.utils import weight_norm
 
-from metalarena.models.blocks.Chomp1d import Chomp1d
-from metalarena.models.utils import conditional_apply, init_tcn_conv_weight
+from tcn_lib.models.blocks.Chomp1d import Chomp1d
+from tcn_lib.utils import conditional_apply, init_tcn_conv_weight
 
 
 class TemporalLayer(nn.Sequential):
