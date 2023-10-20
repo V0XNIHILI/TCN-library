@@ -19,8 +19,8 @@ class TemporalBottleneck(nn.Module):
                  dropout=0.2,
                  batch_norm=False,
                  weight_norm=False,
-                 residual=True,
-                 groups=1):
+                 groups=1,
+                 residual=True):
         """Basically the same idea as a bottleneck layer in a ResNet, but now
         for a 1D convolutional network.
 

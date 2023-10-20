@@ -20,9 +20,13 @@ class TemporalConvNet(nn.Sequential):
                  dropout=0.2,
                  batch_norm=False,
                  weight_norm=False,
+                 bottleneck=False,
+                 groups=1,
                  residual=True):
         layers = []
         num_levels = len(num_channels)
+
+        Block = TemporalBottleneck if bottleneck else TemporalBlock
 
         for i in range(num_levels):
             dilation_size = 2**i
@@ -31,16 +35,17 @@ class TemporalConvNet(nn.Sequential):
             inside_channels = num_channels[i]
 
             layers += [
-                TemporalBlock(in_channels,
-                              inside_channels,
-                              kernel_size,
-                              stride=1,
-                              dilation=dilation_size,
-                              padding=(kernel_size - 1) * dilation_size,
-                              dropout=dropout,
-                              batch_norm=batch_norm,
-                              weight_norm=weight_norm,
-                              residual=residual)
+                Block(in_channels,
+                      inside_channels,
+                      kernel_size,
+                      stride=1,
+                      dilation=dilation_size,
+                      padding=(kernel_size - 1) * dilation_size,
+                      dropout=dropout,
+                      batch_norm=batch_norm,
+                      weight_norm=weight_norm,
+                      groups=groups,
+                      residual=residual)
             ]
 
         super(TemporalConvNet, self).__init__(*layers)

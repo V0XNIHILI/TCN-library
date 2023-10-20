@@ -15,6 +15,8 @@ class TCN(nn.Module):
                  dropout: float,
                  batch_norm: bool = False,
                  weight_norm: bool = False,
+                 bottleneck: bool = False,
+                 groups: int = 1,
                  residual: bool = True):
         """Temporal Convolutional Network. Implementation based off of: 
         https://github.com/locuslab/TCN/blob/master/TCN/mnist_pixel/model.py.
@@ -27,6 +29,8 @@ class TCN(nn.Module):
             dropout (float): Dropout probability for the temporal convolutional layers.
             batch_norm (bool, optional): Whether to use batch normalization. Defaults to False.
             weight_norm (bool, optional): Whether to use weight normalization. Defaults to False.
+            bottleneck (bool, optional): Whether to use bottleneck layers. Note that when bottleneck = True and groups = -1, a depthwise separable convolution is created. Defaults to False.
+            groups (int, optional): Number of groups for the temporal convolutional layers. Set to -1 for depthwise convolutions. Defaults to 1.
             residual (bool, optional): Whether to use residual connections. Defaults to True.
         """
 
@@ -43,6 +47,8 @@ class TCN(nn.Module):
                             dropout=dropout,
                             batch_norm=batch_norm,
                             weight_norm=weight_norm,
+                            bottleneck=bottleneck,
+                            groups=groups,
                             residual=residual), LastElement1d())
         self.linear = nn.Linear(channel_sizes[-1][1], output_size)
 

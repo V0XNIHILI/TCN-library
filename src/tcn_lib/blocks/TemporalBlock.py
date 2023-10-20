@@ -25,6 +25,7 @@ class TemporalBlock(nn.Module):
                  dropout=0.2,
                  batch_norm=False,
                  weight_norm=False,
+                 groups=1,
                  residual=True):
         super(TemporalBlock, self).__init__()
 
@@ -36,11 +37,11 @@ class TemporalBlock(nn.Module):
         self.temp_layer1 = TemporalLayer(n_inputs, n_intermediates,
                                          kernel_size, stride, dilation,
                                          padding, dropout, batch_norm,
-                                         weight_norm, True)
+                                         weight_norm, True, n_inputs if groups == -1 else groups)
         self.temp_layer2 = TemporalLayer(n_intermediates, n_outputs,
                                          kernel_size, 1, dilation, padding,
                                          dropout, batch_norm, weight_norm,
-                                         False)
+                                         False, n_intermediates if groups == -1 else groups)
 
         self.downsample = PointwiseLayer(
             n_inputs, n_outputs, dropout, batch_norm, weight_norm,
