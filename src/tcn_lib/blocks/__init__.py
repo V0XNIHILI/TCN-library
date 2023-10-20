@@ -1,4 +1,3 @@
-from tcn_lib.blocks.ChannelSearch1d import ChannelSearch1d
 from tcn_lib.blocks.Chomp1d import Chomp1d
 from tcn_lib.blocks.LastElement1d import LastElement1d
 from tcn_lib.blocks.PointwiseLayer import PointwiseLayer

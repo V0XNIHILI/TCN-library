@@ -1,5 +1,6 @@
 from typing import List, Tuple, Union
 
+import torch
 from torch import nn
 
 from tcn_lib.blocks import LastElement1d, TemporalConvNet
@@ -12,7 +13,7 @@ class TCN(nn.Module):
                  output_size: int,
                  channel_sizes: Union[List[int], List[Tuple[int, int]]],
                  kernel_size: int,
-                 dropout: float,
+                 dropout: float = 0.0,
                  batch_norm: bool = False,
                  weight_norm: bool = False,
                  bottleneck: bool = False,
@@ -26,7 +27,7 @@ class TCN(nn.Module):
             output_size (int): Final output size.
             channel_sizes (Union[List[int], List[Tuple[int, int]]]): Number of channels in each layer.
             kernel_size (int): Kernel size (the same for each layer)
-            dropout (float): Dropout probability for the temporal convolutional layers.
+            dropout (float, optional): Dropout probability for the temporal convolutional layers. Defaults to 0.0.
             batch_norm (bool, optional): Whether to use batch normalization. Defaults to False.
             weight_norm (bool, optional): Whether to use weight normalization. Defaults to False.
             bottleneck (bool, optional): Whether to use bottleneck layers. Note that when bottleneck = True and groups = -1, a depthwise separable convolution is created. Defaults to False.

@@ -8,7 +8,7 @@ import torch
 import torch.nn as nn
 from torch.nn.utils import weight_norm
 
-from tcn_lib.models.blocks.Chomp1d import Chomp1d
+from tcn_lib.blocks.Chomp1d import Chomp1d
 from tcn_lib.utils import conditional_apply, init_tcn_conv_weight
 
 
