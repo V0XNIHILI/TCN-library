@@ -32,7 +32,7 @@ seq_mnist_tcn_bn = TCN(1, 10, [25] * 8, 7, batch_norm=True)
 seq_mnist_tcn_no_res = TCN(1, 10, [25] * 8, 7, residual=False)
 
 # MNIST classification model with bottleneck blocks
-mnist_tcn = TCN(1, 10, [(64, 256)] * 8, 7, bottleneck=True)
+seq_mnist_tcn_bottle = TCN(1, 10, [(64, 256)] * 8, 7, bottleneck=True)
 
 # Same model, but with ResNeXt blocks
 mnist_tcn_resnext = TCN(1, 10, [(64, 256)] * 8, 7, bottleneck=True, groups=32)
@@ -41,7 +41,7 @@ mnist_tcn_resnext = TCN(1, 10, [(64, 256)] * 8, 7, bottleneck=True, groups=32)
 mnist_tcn_depthwise = TCN(1, 10, [(64, 256)] * 8, 7, bottleneck=True, groups=-1)
 
 # Same model, but with dropout
-seq_mnist_tcn = TCN(1, 10, [25] * 8, 7, dropout=0.1)
+seq_mnist_tcn_dropout = TCN(1, 10, [25] * 8, 7, dropout=0.1)
 ``````
 
 ## License
