@@ -51,12 +51,3 @@ class TemporalLayer(nn.Sequential):
         super(TemporalLayer, self).__init__(conv, normalize, chomp, relu,
                                             dropout)
 
-    def fuse_model(self):
-        modules_to_fuse = ['0']
-
-        if isinstance(self[1], nn.BatchNorm1d):
-            modules_to_fuse.append('1')
-        if isinstance(self[3], nn.ReLU):
-            modules_to_fuse.append('3')
-
-        torch.quantization.fuse_modules(self, [modules_to_fuse], inplace=True)
