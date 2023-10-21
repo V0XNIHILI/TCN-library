@@ -8,6 +8,7 @@ Compared to the original code base, the following extra features were added:
 - Possible to disable residual connections
 - Support for ResNeXt blocks
 - Support for depthwise separable convolutions
+- Performing [Kaiming](https://pytorch.org/docs/stable/nn.init.html#torch.nn.init.kaiming_uniform_) initialization for ReLU activated networks
 
 ## Installation
 
@@ -28,6 +29,9 @@ seq_mnist_tcn = TCN(1, 10, [25] * 8, 7)
 # Same model, but with batch normalization
 seq_mnist_tcn_bn = TCN(1, 10, [25] * 8, 7, batch_norm=True)
 
+# Same model, but with weight normalization
+seq_mnist_tcn_wn = TCN(1, 10, [25] * 8, 7, weight_norm=True)
+
 # Same model, but without residual connections
 seq_mnist_tcn_no_res = TCN(1, 10, [25] * 8, 7, residual=False)
 
@@ -42,7 +46,7 @@ mnist_tcn_depthwise = TCN(1, 10, [(64, 256)] * 8, 7, bottleneck=True, groups=-1)
 
 # Same model, but with dropout
 seq_mnist_tcn_dropout = TCN(1, 10, [25] * 8, 7, dropout=0.1)
-``````
+```
 
 ## License
 
