@@ -9,6 +9,7 @@ Compared to the original code base, the following extra features were added:
 - Support for ResNeXt blocks
 - Support for depthwise separable convolutions
 - Performing [Kaiming](https://pytorch.org/docs/stable/nn.init.html#torch.nn.init.kaiming_uniform_) initialization for ReLU activated networks
+- Small [`stats.py`](src/tcn_lib/stats.py) module to compute TCN properties such its receptive field size
 
 ## Installation
 
@@ -23,6 +24,8 @@ pip install -e .
 ```
 
 ## Usage
+
+### Model
 
 ```python
 from tcn_lib import TCN
@@ -53,6 +56,20 @@ mnist_tcn_depthwise = TCN(1, 10, [(64, 256)] * 8, 7, bottleneck=True, groups=-1)
 
 # Same model, but with dropout
 seq_mnist_tcn_dropout = TCN(1, 10, [25] * 8, 7, dropout=0.1)
+```
+
+### Statistics
+
+Various small functions to calculate properties such as the receptive field size of a TCN.
+
+```python
+from tcn_lib.stats import get_receptive_field_size, get_kernel_size_and_layers
+
+# Get the receptive field size of a TCN kernel size 3 and with 4 layers
+receptive_field = get_receptive_field_size(3, 4)  # 61
+
+# Get the closest (kernel size, number of layers) pair for a required receptive field size of 100
+kernel_size, num_layers = get_kernel_size_and_layers(100)  # (9, 3)
 ```
 
 ## License
