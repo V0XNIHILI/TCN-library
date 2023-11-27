@@ -1,4 +1,4 @@
-from typing import List, Tuple, Union
+from typing import List, Tuple, Union, Final
 
 import torch
 from torch import nn
@@ -7,6 +7,8 @@ from tcn_lib.blocks import LastElement1d, TemporalConvNet
 
 
 class TCN(nn.Module):
+
+    has_linear_layer : Final[bool]
 
     def __init__(self,
                  input_size: int,
@@ -24,7 +26,7 @@ class TCN(nn.Module):
 
         Args:
             input_size (int): Dimensionality of each input time step.
-            output_size (int): Final output size.
+            output_size (int): Final output size. Set to -1 to omit the linear layer.
             channel_sizes (Union[List[int], List[Tuple[int, int]]]): Number of channels in each layer.
             kernel_size (int): Kernel size (the same for each layer)
             dropout (float, optional): Dropout probability for the temporal convolutional layers. Defaults to 0.0.
@@ -51,12 +53,18 @@ class TCN(nn.Module):
                             bottleneck=bottleneck,
                             groups=groups,
                             residual=residual), LastElement1d())
-        self.linear = nn.Linear(channel_sizes[-1][1], output_size)
+
+        self.has_linear_layer = output_size != -1
+
+        if self.has_linear_layer:
+            self.linear = nn.Linear(channel_sizes[-1][1], output_size)
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
         """Inputs need to have shape (N, C_in, L_in)"""
 
-        y1 = self.embedder(inputs)
-        o = self.linear(y1)
+        out = self.embedder(inputs)
 
-        return o
+        if self.has_linear_layer:
+            out = self.linear(y1)
+
+        return out
