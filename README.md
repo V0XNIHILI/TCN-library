@@ -60,7 +60,7 @@ seq_mnist_tcn_dropout = TCN(1, 10, [25] * 8, 7, dropout=0.1)
 
 ### Statistics
 
-Various small functions to calculate properties such as the receptive field size of a TCN.
+Various small functions to calculate properties such as the receptive field size of a TCN. For a variety of plots based on the properties of a TCN, please refer to [this repository](https://github.com/V0XNIHILI/msc-thesis-plots).
 
 ```python
 from tcn_lib.stats import get_receptive_field_size, get_kernel_size_and_layers, create_graph
