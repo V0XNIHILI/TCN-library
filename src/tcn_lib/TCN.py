@@ -65,6 +65,6 @@ class TCN(nn.Module):
         out = self.embedder(inputs)
 
         if self.has_linear_layer:
-            out = self.linear(y1)
+            out = self.linear(out)
 
         return out
