@@ -63,13 +63,22 @@ seq_mnist_tcn_dropout = TCN(1, 10, [25] * 8, 7, dropout=0.1)
 Various small functions to calculate properties such as the receptive field size of a TCN.
 
 ```python
-from tcn_lib.stats import get_receptive_field_size, get_kernel_size_and_layers
+from tcn_lib.stats import get_receptive_field_size, get_kernel_size_and_layers, create_graph
 
 # Get the receptive field size of a TCN kernel size 3 and with 4 layers
 receptive_field = get_receptive_field_size(3, 4)  # 61
 
 # Get the closest (kernel size, number of layers) pair for a required receptive field size of 100
 kernel_size, num_layers = get_kernel_size_and_layers(100)  # (9, 3)
+
+# Plot a graph of a TCN with kernel size 3 and 4 layers
+import matplotlib.pyplot as plt
+
+G, pos, color_map = create_graph(3, 4) # Requires networkx pip package installed
+
+plt.figure(figsize=(10, 5))
+nx.draw(G, pos, with_labels=False, font_size=7, node_color=color_map, node_size=90) 
+plt.show()
 ```
 
 ## License
