@@ -27,6 +27,9 @@ pip install -e .
 ```python
 from tcn_lib import TCN
 
+# Model without linear layer (for regression tasks), by setting output_size to -1
+seq_mnist_tcn = TCN(1, -1, [25] * 8, 7)
+
 # Model for sequential MNIST task
 seq_mnist_tcn = TCN(1, 10, [25] * 8, 7)
 
