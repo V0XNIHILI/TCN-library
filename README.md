@@ -13,6 +13,10 @@ Compared to the original code base, the following extra features were added:
 ## Installation
 
 ```bash
+pip install git+https://github.com/V0XNIHILI/TCN-library.git
+
+# Or:
+
 git clone git@github.com:V0XNIHILI/TCN-library.git
 cd TCN-library
 pip install -e .
