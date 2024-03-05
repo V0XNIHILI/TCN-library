@@ -43,19 +43,20 @@ class TemporalBlock(nn.Module):
                                          dropout, batch_norm, weight_norm,
                                          False, n_intermediates if groups == -1 else groups)
 
+        # No bias needed in this layer as the bias of temp_layer2 will have the same effect
         self.downsample = PointwiseLayer(
             n_inputs, n_outputs, dropout, batch_norm, weight_norm,
-            False) if requires_downsample else None
+            False, True) if requires_downsample else None
 
         self.relu = nn.ReLU(inplace=True)
 
     def forward(self, x: torch.Tensor):
-        res = x
-
         out = self.temp_layer1(x)
         out = self.temp_layer2(out)
 
         if self.residual:
+            res = x
+
             if self.downsample is not None:
                 res = self.downsample(res)   
                      
