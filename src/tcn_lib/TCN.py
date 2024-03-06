@@ -59,7 +59,14 @@ class TCN(nn.Module):
             self.linear = nn.Linear(channel_sizes[-1][1], output_size)
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
-        """Inputs need to have shape (N, C_in, L_in)"""
+        """Forward pass of the TCN.
+
+        Args:
+            inputs (torch.Tensor): Inputs into the TCN. Tensor should be of shape (N, C_in, L_in).
+
+        Returns:
+            torch.Tensor: Output of the TCN. Tensor will be of shape (N, C_out).
+        """
 
         out = self.embedder(inputs)
 
