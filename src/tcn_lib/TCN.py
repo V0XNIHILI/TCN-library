@@ -13,7 +13,7 @@ class TCN(nn.Module):
     def __init__(self,
                  input_size: int,
                  output_size: int,
-                 channel_sizes: Union[List[int], List[Tuple[int, int]]],
+                 channel_sizes: List[Union[int, Tuple[int, int]]],
                  kernel_size: int,
                  dropout: float = 0.0,
                  batch_norm: bool = False,
@@ -40,8 +40,7 @@ class TCN(nn.Module):
         super(TCN, self).__init__()
 
         # Make sure that also specifying one channel size per temporal layer works
-        if type(channel_sizes[0]) == int:
-            channel_sizes = [[a, a] for a in channel_sizes]
+        channel_sizes = [channel_size if type(channel_size) is not int else (channel_size, channel_size) for channel_size in channel_sizes]
 
         self.embedder = nn.Sequential(
             TemporalConvNet(input_size,
