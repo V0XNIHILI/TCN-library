@@ -4,7 +4,7 @@ https://github.com/locuslab/TCN/blob/2f8c2b817050206397458d
 fd1f5a25ce8a32fe65/TCN/tcn.py.
 """
 
-from typing import List, Tuple
+from typing import List, Tuple, Union
 
 import torch.nn as nn
 
@@ -16,7 +16,7 @@ class TemporalConvNet(nn.Sequential):
     def __init__(self,
                  num_inputs: int,
                  num_channels: List[Tuple[int, int]],
-                 kernel_size=2,
+                 kernel_size: Union[int, List[int], List[Tuple[int, int]]],
                  dropout=0.2,
                  batch_norm=False,
                  weight_norm=False,
@@ -24,20 +24,26 @@ class TemporalConvNet(nn.Sequential):
                  groups=1,
                  residual=True):
         layers = []
-        num_levels = len(num_channels)
 
         Block = TemporalBottleneck if bottleneck else TemporalBlock
 
-        for i in range(num_levels):
+        for i in range(len(num_channels)):
             dilation_size = 2**i
 
             in_channels = num_inputs if i == 0 else num_channels[i - 1][1]
-            inside_channels = num_channels[i]
+            block_kernel_size = kernel_size[i] if isinstance(kernel_size, list) else kernel_size
+
+            if isinstance(block_kernel_size, tuple):
+                if bottleneck:
+                    raise ValueError("Bottleneck layers do not support two kernel sizes per block.")
+            else:
+                if not bottleneck:
+                    block_kernel_size = (block_kernel_size, block_kernel_size)
 
             layers += [
                 Block(in_channels,
-                      inside_channels,
-                      kernel_size,
+                      num_channels[i],
+                      block_kernel_size,
                       stride=1,
                       dilation=dilation_size,
                       padding=(kernel_size - 1) * dilation_size,

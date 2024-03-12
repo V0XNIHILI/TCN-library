@@ -18,7 +18,7 @@ class TemporalBlock(nn.Module):
     def __init__(self,
                  n_inputs: int,
                  n_channels: Tuple[int, int],
-                 kernel_size: int,
+                 kernel_size: Tuple[int, int],
                  stride: int,
                  dilation: int,
                  padding: int,
@@ -30,16 +30,17 @@ class TemporalBlock(nn.Module):
         super(TemporalBlock, self).__init__()
 
         n_intermediates, n_outputs = n_channels
+        kernel_size_1, kernel_size_2 = kernel_size
         requires_downsample = n_inputs != n_outputs and residual
 
         self.residual = residual
 
         self.temp_layer1 = TemporalLayer(n_inputs, n_intermediates,
-                                         kernel_size, stride, dilation,
+                                         kernel_size_1, stride, dilation,
                                          padding, dropout, batch_norm,
                                          weight_norm, True, n_inputs if groups == -1 else groups)
         self.temp_layer2 = TemporalLayer(n_intermediates, n_outputs,
-                                         kernel_size, 1, dilation, padding,
+                                         kernel_size_2, 1, dilation, padding,
                                          dropout, batch_norm, weight_norm,
                                          False, n_intermediates if groups == -1 else groups)
 
