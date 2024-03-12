@@ -14,7 +14,7 @@ class TCN(nn.Module):
                  input_size: int,
                  output_size: int,
                  channel_sizes: List[Union[int, Tuple[int, int]]],
-                 kernel_size: Union[int, List[int], List[Tuple[int, int]]],
+                 kernel_size: Union[int, List[int]],
                  dropout: float = 0.0,
                  batch_norm: bool = False,
                  weight_norm: bool = False,
@@ -28,7 +28,7 @@ class TCN(nn.Module):
             input_size (int): Dimensionality of each input time step.
             output_size (int): Final output size. Set to -1 to omit the linear layer.
             channel_sizes (Union[List[int], List[Tuple[int, int]]]): Number of channels in each layer.
-            kernel_size (Union[int, List[int], List[Tuple[int, int]]]): Kernel size. Can be specified for the whole network as a single int, per layer as a list of ints, or per block as a list of tuples of ints.
+            kernel_size (Union[int, List[int]]): Kernel size. Can be specified for the whole network as a single int, per layer as a list of ints.
             dropout (float, optional): Dropout probability for the temporal convolutional layers. Defaults to 0.0.
             batch_norm (bool, optional): Whether to use batch normalization. Defaults to False.
             weight_norm (bool, optional): Whether to use weight normalization. Defaults to False.

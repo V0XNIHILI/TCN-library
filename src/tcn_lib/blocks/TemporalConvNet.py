@@ -16,7 +16,7 @@ class TemporalConvNet(nn.Sequential):
     def __init__(self,
                  num_inputs: int,
                  num_channels: List[Tuple[int, int]],
-                 kernel_size: Union[int, List[int], List[Tuple[int, int]]],
+                 kernel_size: Union[int, List[int]],
                  dropout=0.2,
                  batch_norm=False,
                  weight_norm=False,
@@ -33,20 +33,13 @@ class TemporalConvNet(nn.Sequential):
             in_channels = num_inputs if i == 0 else num_channels[i - 1][1]
             block_kernel_size = kernel_size[i] if isinstance(kernel_size, list) else kernel_size
 
-            if isinstance(block_kernel_size, tuple):
-                if bottleneck:
-                    raise ValueError("Bottleneck layers do not support two kernel sizes per block.")
-            else:
-                if not bottleneck:
-                    block_kernel_size = (block_kernel_size, block_kernel_size)
-
             layers += [
                 Block(in_channels,
                       num_channels[i],
                       block_kernel_size,
                       stride=1,
                       dilation=dilation_size,
-                      padding=(kernel_size - 1) * dilation_size,
+                      padding=(block_kernel_size - 1) * dilation_size,
                       dropout=dropout,
                       batch_norm=batch_norm,
                       weight_norm=weight_norm,

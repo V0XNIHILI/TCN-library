@@ -36,6 +36,9 @@ seq_mnist_tcn = TCN(1, -1, [25] * 8, 7)
 # Model for sequential MNIST task
 seq_mnist_tcn = TCN(1, 10, [25] * 8, 7)
 
+# First 4 layers have kernel size 5, the next 4 layers have kernel size 7
+seq_mnist_tcn = TCN(1, -1, [25] * 8, [5] * 4 + [7] * 4)
+
 # Same model, but with batch normalization
 seq_mnist_tcn_bn = TCN(1, 10, [25] * 8, 7, batch_norm=True)
 
