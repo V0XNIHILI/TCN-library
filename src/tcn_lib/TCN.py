@@ -62,7 +62,7 @@ class TCN(nn.Module):
         """Forward pass of the TCN.
 
         Args:
-            inputs (torch.Tensor): Inputs into the TCN. Tensor should be of shape (N, C_in, L_in).
+            inputs (torch.Tensor): Inputs into the TCN. Tensor should be of shape (N = batch size, C_in = input channels, L_in = input length).
 
         Returns:
             torch.Tensor: Output of the TCN. Tensor will be of shape (N, C_out).
