@@ -25,7 +25,7 @@ class TCN(nn.Module):
         https://github.com/locuslab/TCN/blob/master/TCN/mnist_pixel/model.py.
 
         Args:
-            input_size (int): Dimensionality of each input time step.
+            input_size (int): Dimensionality or number of channels of each input time step.
             output_size (int): Final output size. Set to -1 to omit the linear layer.
             channel_sizes (Union[List[int], List[Tuple[int, int]]]): Number of channels in each layer.
             kernel_size (Union[int, List[int]]): Kernel size. Can be specified for the whole network as a single int, per layer as a list of ints.
@@ -62,7 +62,7 @@ class TCN(nn.Module):
         """Forward pass of the TCN.
 
         Args:
-            inputs (torch.Tensor): Inputs into the TCN. Tensor should be of shape (N, C_in, L_in).
+            inputs (torch.Tensor): Inputs into the TCN. Tensor should be of shape (N = batch size, C_in = input channels, L_in = input length).
 
         Returns:
             torch.Tensor: Output of the TCN. Tensor will be of shape (N, C_out).
