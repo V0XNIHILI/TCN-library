@@ -4,9 +4,7 @@ https://github.com/locuslab/TCN/blob/2f8c2b817050206397458d
 fd1f5a25ce8a32fe65/TCN/tcn.py.
 """
 
-import torch
 import torch.nn as nn
-from torch.nn.utils import weight_norm
 
 from tcn_lib.blocks.Chomp1d import Chomp1d
 from tcn_lib.utils import conditional_apply, init_tcn_conv_weight
@@ -29,7 +27,7 @@ class TemporalLayer(nn.Sequential):
         # We apply padding on both sides and remove the extra values on the right side
         # We could have also only applied padding on the left side like here:
         # https://github.com/locuslab/TCN/issues/8#issuecomment-384345206
-        conv = conditional_apply(weight_norm, use_weight_norm)(
+        conv = conditional_apply(nn.utils.parametrizations.weight_norm, use_weight_norm)(
             nn.Conv1d(
                 n_inputs,
                 n_outputs,
