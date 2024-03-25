@@ -9,7 +9,9 @@ Compared to the original code base, the following extra features were added:
 - Support for ResNeXt blocks
 - Support for depthwise separable convolutions
 - Removed all possible double biases for optimal training speed (i.e. when using batch normalization)
-- Performing [Kaiming](https://pytorch.org/docs/stable/nn.init.html#torch.nn.init.kaiming_uniform_) initialization for ReLU activated networks
+- Performing [Kaiming](https://pytorch.org/docs/stable/nn.init.html#torch.nn.init.kaiming_uniform_) initialization for ReLU-activated networks
+- Initializing batch norm weights to 1.0 and biases to 0.0
+- Optionally zero-initially the last batch norm in each block (per https://arxiv.org/abs/1706.02677)
 - Small [`stats.py`](src/tcn_lib/stats.py) module to compute TCN properties such its receptive field size
 
 ## Installation
@@ -42,6 +44,9 @@ seq_mnist_tcn = TCN(1, -1, [25] * 8, [5] * 4 + [7] * 4)
 
 # Same model, but with batch normalization
 seq_mnist_tcn_bn = TCN(1, 10, [25] * 8, 7, batch_norm=True)
+
+# Now also include zero-initializing the last batch norm in each block
+seq_mnist_tcn_bn_zi = TCN(1, 10, [25] * 8, 7, batch_norm=True, zero_init_residual=True)
 
 # Same model, but with weight normalization
 seq_mnist_tcn_wn = TCN(1, 10, [25] * 8, 7, weight_norm=True)
