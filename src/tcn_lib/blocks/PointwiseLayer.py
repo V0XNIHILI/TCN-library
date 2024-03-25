@@ -1,7 +1,7 @@
 import torch.nn as nn
 from torch.nn.utils import weight_norm
 
-from tcn_lib.utils import conditional_apply, init_tcn_conv_weight
+from tcn_lib.utils import conditional_apply
 
 
 class PointwiseLayer(nn.Sequential):
@@ -25,7 +25,5 @@ class PointwiseLayer(nn.Sequential):
             out_channels) if batch_norm else nn.Identity()
         relu = nn.ReLU(inplace=True) if with_activation else nn.Identity()
         dropout = nn.Dropout(dropout)
-
-        init_tcn_conv_weight(conv)
 
         super(PointwiseLayer, self).__init__(conv, normalize, relu, dropout)

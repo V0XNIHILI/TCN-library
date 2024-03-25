@@ -9,7 +9,7 @@ from typing import List, Tuple, Union
 import torch.nn as nn
 
 from tcn_lib.blocks import TemporalBlock, TemporalBottleneck
-
+from tcn_lib.utils import init_tcn_conv_weight, init_batch_norm
 
 class TemporalConvNet(nn.Sequential):
 
@@ -22,7 +22,13 @@ class TemporalConvNet(nn.Sequential):
                  weight_norm=False,
                  bottleneck=False,
                  groups=1,
-                 residual=True):
+                 residual=True,
+                 zero_init_residual=False):
+        if zero_init_residual == True and not batch_norm:
+            raise ValueError(
+                "To use zero_init_residual, batch_norm has to be set to True."
+            )
+    
         layers = []
 
         Block = TemporalBottleneck if bottleneck else TemporalBlock
@@ -46,5 +52,21 @@ class TemporalConvNet(nn.Sequential):
                       groups=groups,
                       residual=residual)
             ]
+
+        for m in self.modules():
+            if isinstance(m, nn.Conv1d):
+                init_tcn_conv_weight(m)
+            elif isinstance(m, nn.BatchNorm1d):
+                init_batch_norm(m)
+
+        # Zero-initialize the last BN in each residual branch,
+        # so that the residual branch starts with zeros, and each residual block behaves like an identity.
+        # This improves the model by 0.2~0.3% according to https://arxiv.org/abs/1706.02677
+        if zero_init_residual:
+            for m in self.modules():
+                if isinstance(m, TemporalBlock):
+                    nn.init.constant_(m.temp_layer2[1].weight, 0)
+                elif isinstance(m, TemporalBottleneck):
+                    nn.init.constant_(m.temp_layer3[1].weight, 0)
 
         super(TemporalConvNet, self).__init__(*layers)

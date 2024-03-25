@@ -7,7 +7,7 @@ fd1f5a25ce8a32fe65/TCN/tcn.py.
 import torch.nn as nn
 
 from tcn_lib.blocks.Chomp1d import Chomp1d
-from tcn_lib.utils import conditional_apply, init_tcn_conv_weight
+from tcn_lib.utils import conditional_apply
 
 
 class TemporalLayer(nn.Sequential):
@@ -43,8 +43,6 @@ class TemporalLayer(nn.Sequential):
         normalize = nn.BatchNorm1d(n_outputs) if batch_norm else nn.Identity()
         relu = nn.ReLU(inplace=True) if with_activation else nn.Identity()
         dropout = nn.Dropout(dropout)
-
-        init_tcn_conv_weight(conv)
 
         super(TemporalLayer, self).__init__(conv, normalize, chomp, relu,
                                             dropout)

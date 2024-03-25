@@ -1,2 +1,3 @@
 from tcn_lib.utils.conditional_apply import conditional_apply
 from tcn_lib.utils.init_tcn_conv_weight import init_tcn_conv_weight
+from tcn_lib.utils.init_batch_norm import init_batch_norm
