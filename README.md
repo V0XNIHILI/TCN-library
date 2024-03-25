@@ -8,6 +8,7 @@ Compared to the original code base, the following extra features were added:
 - Possible to disable residual connections
 - Support for ResNeXt blocks
 - Support for depthwise separable convolutions
+- Removed all possible double biases for optimal training speed (i.e. when using batch normalization)
 - Performing [Kaiming](https://pytorch.org/docs/stable/nn.init.html#torch.nn.init.kaiming_uniform_) initialization for ReLU activated networks
 - Small [`stats.py`](src/tcn_lib/stats.py) module to compute TCN properties such its receptive field size
 
@@ -65,24 +66,38 @@ seq_mnist_tcn_dropout = TCN(1, 10, [25] * 8, 7, dropout=0.1)
 
 Various small functions to calculate properties such as the receptive field size of a TCN. For a variety of plots based on the properties of a TCN, please refer to [this repository](https://github.com/V0XNIHILI/msc-thesis-plots).
 
+Get the receptive field size of a TCN kernel size 3 and with 4 layers:
+
 ```python
-from tcn_lib.stats import get_receptive_field_size, get_kernel_size_and_layers, create_graph
+from tcn_lib.stats import get_receptive_field_size
 
-# Get the receptive field size of a TCN kernel size 3 and with 4 layers
 receptive_field = get_receptive_field_size(3, 4)  # 61
+```
 
-# Get the closest (kernel size, number of layers) pair for a required receptive field size of 100
+Get the closest (kernel size, number of layers) pair for a required receptive field size of 100:
+
+```python
+from tcn_lib.stats import get_kernel_size_and_layers
+
 kernel_size, num_layers = get_kernel_size_and_layers(100)  # (9, 3)
+```
 
-# Plot a graph of a TCN with kernel size 3 and 4 layers
+Plot a graph of a TCN with kernel size 5 and 2 layers:
+
+```python
 import matplotlib.pyplot as plt
+import networkx as nx
 
-G, pos, color_map = create_graph(3, 4) # Requires networkx pip package installed
+from tcn_lib.stats import get_kernel_size_and_layers, create_graph
+
+G, pos, color_map = create_graph(5, 2) # Requires networkx pip package installed
 
 plt.figure(figsize=(10, 5))
 nx.draw(G, pos, with_labels=False, font_size=7, node_color=color_map, node_size=90) 
 plt.show()
 ```
+
+![Graph of a TCN with kernel size 5 and 2 layers](docs/img/tcn_k5_l2.png)
 
 ## License
 
