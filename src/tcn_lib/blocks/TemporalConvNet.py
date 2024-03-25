@@ -53,6 +53,8 @@ class TemporalConvNet(nn.Sequential):
                       residual=residual)
             ]
 
+        super(TemporalConvNet, self).__init__(*layers)
+
         for m in self.modules():
             if isinstance(m, nn.Conv1d):
                 init_tcn_conv_weight(m)
@@ -68,5 +70,3 @@ class TemporalConvNet(nn.Sequential):
                     nn.init.constant_(m.temp_layer2[1].weight, 0)
                 elif isinstance(m, TemporalBottleneck):
                     nn.init.constant_(m.temp_layer3[1].weight, 0)
-
-        super(TemporalConvNet, self).__init__(*layers)
