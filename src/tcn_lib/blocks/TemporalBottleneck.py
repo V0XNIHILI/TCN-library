@@ -37,17 +37,17 @@ class TemporalBottleneck(nn.Module):
         self.residual = residual
 
         self.temp_layer1 = PointwiseLayer(n_inputs, n_intermediates, dropout,
-                                          batch_norm, weight_norm, True)
+                                          batch_norm, weight_norm, True, True)
         self.temp_layer2 = TemporalLayer(n_intermediates, n_intermediates,
                                          kernel_size, stride, dilation,
                                          padding, dropout, batch_norm,
                                          weight_norm, True, n_intermediates if groups == -1 else groups)
         self.temp_layer3 = PointwiseLayer(n_intermediates, n_outputs, dropout,
-                                          batch_norm, weight_norm, False)
+                                          batch_norm, weight_norm, False, True)
 
         self.downsample = PointwiseLayer(
             n_inputs, n_outputs, dropout, batch_norm, weight_norm,
-            False) if requires_downsample else None
+            False, False) if requires_downsample else None
 
         self.relu = nn.ReLU(inplace=True)
 
