@@ -1,4 +1,3 @@
-import torch
 import torch.nn as nn
 from torch.nn.utils import weight_norm
 
@@ -14,14 +13,14 @@ class PointwiseLayer(nn.Sequential):
                  batch_norm: bool = False,
                  use_weight_norm=False,
                  with_activation=True,
-                 without_bias=True):
+                 with_bias=False):
         conv = conditional_apply(weight_norm, use_weight_norm)(
             nn.Conv1d(
                 in_channels,
                 out_channels,
                 1,
                 # Following: https://pytorch.org/tutorials/recipes/recipes/tuning_guide.html#disable-bias-for-convolutions-directly-followed-by-a-batch-norm
-                bias=not (batch_norm or without_bias)))
+                bias=with_bias and not batch_norm))
         normalize = nn.BatchNorm1d(
             out_channels) if batch_norm else nn.Identity()
         relu = nn.ReLU(inplace=True) if with_activation else nn.Identity()

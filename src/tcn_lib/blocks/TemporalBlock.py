@@ -46,7 +46,7 @@ class TemporalBlock(nn.Module):
         # No bias needed in this layer as the bias of temp_layer2 will have the same effect
         self.downsample = PointwiseLayer(
             n_inputs, n_outputs, dropout, batch_norm, weight_norm,
-            False, True) if requires_downsample else None
+            False, False) if requires_downsample else None
 
         self.relu = nn.ReLU(inplace=True)
 
