@@ -26,11 +26,12 @@ class TemporalBlock(nn.Module):
                  batch_norm=False,
                  weight_norm=False,
                  groups=1,
-                 residual=True):
+                 residual=True,
+                 force_downsample=False):
         super(TemporalBlock, self).__init__()
 
         n_intermediates, n_outputs = n_channels
-        requires_downsample = n_inputs != n_outputs and residual
+        requires_downsample = (n_inputs != n_outputs or force_downsample) and residual
 
         self.residual = residual
 

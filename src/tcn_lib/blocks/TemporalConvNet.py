@@ -23,6 +23,7 @@ class TemporalConvNet(nn.Sequential):
                  bottleneck=False,
                  groups=1,
                  residual=True,
+                 force_downsample=False,
                  zero_init_residual=False):
         if zero_init_residual == True and not batch_norm:
             raise ValueError(
@@ -50,7 +51,8 @@ class TemporalConvNet(nn.Sequential):
                       batch_norm=batch_norm,
                       weight_norm=weight_norm,
                       groups=groups,
-                      residual=residual)
+                      residual=residual,
+                      force_downsample=force_downsample)
             ]
 
         super(TemporalConvNet, self).__init__(*layers)

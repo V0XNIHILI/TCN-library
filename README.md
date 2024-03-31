@@ -54,6 +54,9 @@ seq_mnist_tcn_wn = TCN(1, 10, [25] * 8, 7, weight_norm=True)
 # Same model, but without residual connections
 seq_mnist_tcn_no_res = TCN(1, 10, [25] * 8, 7, residual=False)
 
+# Same model, but with 1x1 convolutions in all residual connections
+seq_mnist_tcn_1x1 = TCN(1, 10, [25] * 8, 7, force_downsample=True)
+
 # MNIST classification model with bottleneck blocks
 seq_mnist_tcn_bottle = TCN(1, 10, [(64, 256)] * 8, 7, bottleneck=True)
 

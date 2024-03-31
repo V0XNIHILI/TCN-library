@@ -21,6 +21,7 @@ class TCN(nn.Module):
                  bottleneck: bool = False,
                  groups: int = 1,
                  residual: bool = True,
+                 force_downsample: bool = False,
                  zero_init_residual: bool = False):
         """Temporal Convolutional Network. Implementation based off of: 
         https://github.com/locuslab/TCN/blob/master/TCN/mnist_pixel/model.py.
@@ -36,6 +37,7 @@ class TCN(nn.Module):
             bottleneck (bool, optional): Whether to use bottleneck layers. Note that when bottleneck = True and groups = -1, a depthwise separable convolution is created. Defaults to False.
             groups (int, optional): Number of groups for the temporal convolutional layers. Set to -1 for depthwise convolutions. Defaults to 1.
             residual (bool, optional): Whether to use residual connections. Defaults to True.
+            force_downsample (bool, optional): Whether to force downsample in every layer instead of doing an identity shortcut when the number of input channels is equal to the number of output channels. Defaults to False.
             zero_init_residual (bool, optional): Whether to zero initialize the residual connections (per: https://arxiv.org/abs/1706.0267). Defaults to False.
         """
 
@@ -54,6 +56,7 @@ class TCN(nn.Module):
                             bottleneck=bottleneck,
                             groups=groups,
                             residual=residual,
+                            force_downsample=force_downsample,
                             zero_init_residual=zero_init_residual), LastElement1d())
 
         self.has_linear_layer = output_size != -1
