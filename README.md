@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="396" height="139" src="docs/img/logo.png" alt="logo">
+  <img width="594" height="209" src="docs/img/logo.png" alt="logo">
 </p>
 
 # TCN library (`tcn_lib`)
