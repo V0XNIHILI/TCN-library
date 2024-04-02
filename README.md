@@ -1,3 +1,7 @@
+<p align="center">
+  <img width="396" height="139" src="docs/img/logo.png" alt="logo">
+</p>
+
 # TCN library (`tcn_lib`)
 
 This is a library for Temporal Convolutional Networks (TCNs) in PyTorch. It is based on the TCN as described in the paper [An Empirical Evaluation of Generic Convolutional and Recurrent Networks for Sequence Modeling](https://arxiv.org/abs/1803.01271) by Shaojie Bai, J. Zico Kolter and Vladlen Koltun. The code is largely based on the [original PyTorch implementation](https://github.com/locuslab/TCN) from the authors.
