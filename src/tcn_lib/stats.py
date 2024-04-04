@@ -1,6 +1,5 @@
 from typing import List, Union, Tuple
 
-import networkx as nx
 
 def get_receptive_field_size(kernel_size: int,
                              num_layers: int,
@@ -78,6 +77,8 @@ def create_graph(kernel_size: int, num_layers: int, input_size: Union[int, None]
         the positions of the nodes in the graph
     """
 
+    import networkx as nx
+
     base_color, ancestor_color = ('blue', 'red') if colors is None else colors
 
     G = nx.DiGraph()
@@ -144,6 +145,7 @@ def create_graph(kernel_size: int, num_layers: int, input_size: Union[int, None]
 
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
+    import networkx as nx
 
     k = 3
     total_layers = 3
