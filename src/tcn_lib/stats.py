@@ -1,7 +1,7 @@
 from typing import List, Union, Tuple
 
 
-def get_receptive_field_size(kernel_size: int,
+def get_receptive_field_size(kernel_size: Union[int, List[int]],
                              num_layers: int,
                              dilation_exponential_base: int = 2):
     """Calculate the receptive field size of a TCN. We assume the TCN structure of the paper
@@ -10,7 +10,7 @@ def get_receptive_field_size(kernel_size: int,
     Due to: https://github.com/locuslab/TCN/issues/44#issuecomment-677949937
 
     Args:
-        kernel_size (int): Size of the kernel.
+        kernel_size (Union[int, List[int]]): Size of the kernel(s).
         num_layers (int): Number of layers in the TCN.
         dilation_exponential_base (int, optional): Dilation exponential size. Defaults to 2.
 
@@ -18,9 +18,12 @@ def get_receptive_field_size(kernel_size: int,
         int: Receptive field size.
     """
 
+    if isinstance(kernel_size, int):
+        kernel_size = [kernel_size] * num_layers
+
     return sum([
-        2 * dilation_exponential_base**(l - 1) * (kernel_size - 1)
-        for l in range(num_layers, 0, -1)
+        2 * dilation_exponential_base**(l - 1) * (kernel_size[l-1] - 1)
+        for l in range(1,num_layers+1)
     ]) + 1
 
 def get_kernel_size_and_layers(required_receptive_field_size: int, kernel_sizes: List[int] = [3,5,7,9], dilation_exponential_base: int = 2):

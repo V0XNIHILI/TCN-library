@@ -1,9 +1,11 @@
 from typing import List, Tuple, Union, Final
+import warnings
 
 import torch
 from torch import nn
 
 from tcn_lib.blocks import LastElement1d, TemporalConvNet
+from tcn_lib.stats import get_receptive_field_size
 
 
 class TCN(nn.Module):
@@ -45,6 +47,7 @@ class TCN(nn.Module):
 
         # Make sure that also specifying one channel size per temporal layer works
         channel_sizes = [channel_size if type(channel_size) is not int else (channel_size, channel_size) for channel_size in channel_sizes]
+        self._receptive_field_size = get_receptive_field_size(kernel_size, len(channel_sizes))
 
         self.embedder = nn.Sequential(
             TemporalConvNet(input_size,
@@ -73,6 +76,9 @@ class TCN(nn.Module):
         Returns:
             torch.Tensor: Output of the TCN. Tensor will be of shape (N, C_out).
         """
+
+        if inputs.shape[-1] > self._receptive_field_size:
+            warnings.warn(f"Input length ({inputs.shape[-1]}) is larger than the receptive field size ({self._receptive_field_size}). Use get_kernel_size_and_layers({inputs.shape[-1]}) to find the kernel size and number of layers that have a receptive field size closest to the input length.") 
 
         out = self.embedder(inputs)
 
