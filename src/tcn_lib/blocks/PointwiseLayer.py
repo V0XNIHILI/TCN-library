@@ -11,6 +11,7 @@ class PointwiseLayer(nn.Sequential):
                  out_channels: int,
                  dropout=0.2,
                  batch_norm: bool = False,
+                 dropout_mode='standard',
                  use_weight_norm=False,
                  with_activation=True,
                  with_bias=False):
@@ -24,6 +25,6 @@ class PointwiseLayer(nn.Sequential):
         normalize = nn.BatchNorm1d(
             out_channels) if batch_norm else nn.Identity()
         relu = nn.ReLU(inplace=True) if with_activation else nn.Identity()
-        dropout = nn.Dropout(dropout)
+        dropout = (nn.Dropout1d if dropout_mode == '1d' else nn.Dropout)(dropout) if dropout > 0 else nn.Identity()
 
         super(PointwiseLayer, self).__init__(conv, normalize, relu, dropout)
