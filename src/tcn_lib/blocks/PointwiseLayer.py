@@ -1,5 +1,5 @@
 import torch.nn as nn
-from torch.nn.utils import weight_norm
+from torch.nn.utils.parametrizations import weight_norm
 
 from tcn_lib.utils import conditional_apply
 
