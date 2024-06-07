@@ -21,6 +21,7 @@ class TemporalLayer(nn.Sequential):
                  dilation: int,
                  padding: int,
                  dropout=0.2,
+                 dropout_mode='standard',
                  batch_norm=False,
                  use_weight_norm=False,
                  with_activation=True,
@@ -42,8 +43,8 @@ class TemporalLayer(nn.Sequential):
                 bias=not batch_norm))
         chomp = Chomp1d(padding)
         normalize = nn.BatchNorm1d(n_outputs) if batch_norm else nn.Identity()
-        relu = nn.GELU() if with_activation else nn.Identity()
-        dropout = nn.Dropout(dropout)
+        relu = nn.ReLU(inplace=True) if with_activation else nn.Identity()
+        dropout = (nn.Dropout1d if dropout_mode == '1d' else nn.Dropout)(dropout) if dropout > 0 else nn.Identity()
 
         super(TemporalLayer, self).__init__(conv, normalize, chomp, relu,
                                             dropout)

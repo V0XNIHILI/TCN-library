@@ -23,6 +23,7 @@ class TemporalBlock(nn.Module):
                  dilation: int,
                  padding: int,
                  dropout=0.2,
+                 dropout_mode='standard',
                  batch_norm=False,
                  weight_norm=False,
                  groups=1,
@@ -37,11 +38,11 @@ class TemporalBlock(nn.Module):
 
         self.temp_layer1 = TemporalLayer(n_inputs, n_intermediates,
                                          kernel_size, stride, dilation,
-                                         padding, dropout, batch_norm,
+                                         padding, dropout, dropout_mode, batch_norm,
                                          weight_norm, True, n_inputs if groups == -1 else groups)
         self.temp_layer2 = TemporalLayer(n_intermediates, n_outputs,
                                          kernel_size, 1, dilation, padding,
-                                         dropout, batch_norm, weight_norm,
+                                         dropout, dropout_mode, batch_norm, weight_norm,
                                          False, n_intermediates if groups == -1 else groups)
 
         # No bias needed in this layer as the bias of temp_layer2 will have the same effect

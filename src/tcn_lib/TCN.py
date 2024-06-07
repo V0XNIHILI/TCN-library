@@ -18,6 +18,7 @@ class TCN(nn.Module):
                  channel_sizes: List[Union[int, Tuple[int, int]]],
                  kernel_size: Union[int, List[int]],
                  dropout: float = 0.0,
+                 dropout_mode: str = 'standard',
                  batch_norm: bool = False,
                  weight_norm: bool = False,
                  bottleneck: bool = False,
@@ -34,6 +35,7 @@ class TCN(nn.Module):
             channel_sizes (Union[List[int], List[Tuple[int, int]]]): Number of channels in each layer.
             kernel_size (Union[int, List[int]]): Kernel size. Can be specified for the whole network as a single int, per layer as a list of ints.
             dropout (float, optional): Dropout probability for the temporal convolutional layers. Defaults to 0.0.
+            dropout_mode (str, optional): Dropout mode. Can be 'standard' or '1d'. Defaults to 'standard'.
             batch_norm (bool, optional): Whether to use batch normalization. Defaults to False.
             weight_norm (bool, optional): Whether to use weight normalization. Defaults to False.
             bottleneck (bool, optional): Whether to use bottleneck layers. Note that when bottleneck = True and groups = -1, a depthwise separable convolution is created. Defaults to False.
@@ -54,6 +56,7 @@ class TCN(nn.Module):
                             channel_sizes,
                             kernel_size=kernel_size,
                             dropout=dropout,
+                            dropout_mode=dropout_mode,
                             batch_norm=batch_norm,
                             weight_norm=weight_norm,
                             bottleneck=bottleneck,
