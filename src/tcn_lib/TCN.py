@@ -26,6 +26,7 @@ class TCN(nn.Module):
                  residual: bool = True,
                  force_downsample: bool = False,
                  zero_init_residual: bool = False,
+                 take_last_element: bool = True,
                  input_length: Optional[int] = None):
         """Temporal Convolutional Network. Implementation based off of: 
         https://github.com/locuslab/TCN/blob/master/TCN/mnist_pixel/model.py.
@@ -44,6 +45,7 @@ class TCN(nn.Module):
             residual (bool, optional): Whether to use residual connections. Defaults to True.
             force_downsample (bool, optional): Whether to force downsample in every layer instead of doing an identity shortcut when the number of input channels is equal to the number of output channels. Defaults to False.
             zero_init_residual (bool, optional): Whether to zero initialize the residual connections (per: https://arxiv.org/abs/1706.0267). Defaults to False.
+            take_last_element (bool, optional): Whether to take the last element of the output. Defaults to True.
             input_length (Optional[int], optional): Length of the input; only used to check compatibility with the receptive field size. Defaults to None.
         """
 
@@ -58,8 +60,7 @@ class TCN(nn.Module):
             if input_length > receptive_field_size:
                 warnings.warn(f"Input length ({input_length}) is larger than the receptive field size ({receptive_field_size}). Use get_kernel_size_and_layers({input_length}) to find the kernel size and number of layers that have a receptive field size closest to the input length.") 
 
-        self.embedder = nn.Sequential(
-            TemporalConvNet(input_size,
+        tcn = TemporalConvNet(input_size,
                             channel_sizes,
                             kernel_size=kernel_size,
                             dropout=dropout,
@@ -70,7 +71,12 @@ class TCN(nn.Module):
                             groups=groups,
                             residual=residual,
                             force_downsample=force_downsample,
-                            zero_init_residual=zero_init_residual), LastElement1d())
+                            zero_init_residual=zero_init_residual)
+        
+        if take_last_element:
+            self.embedder = nn.Sequential(tcn, LastElement1d())
+        else:
+            self.embedder = tcn
 
         self.has_linear_layer = output_size != -1
 
