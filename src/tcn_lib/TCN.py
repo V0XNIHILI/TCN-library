@@ -10,7 +10,7 @@ from tcn_lib.stats import get_receptive_field_size
 
 class TCN(nn.Module):
 
-    has_linear_layer : Final[bool]
+    has_linear_layer: Final[bool]
 
     def __init__(self,
                  input_size: int,
@@ -53,26 +53,26 @@ class TCN(nn.Module):
 
         # Make sure that also specifying one channel size per temporal layer works
         channel_sizes = [channel_size if type(channel_size) is not int else (channel_size, channel_size) for channel_size in channel_sizes]
-        
+
         if input_length is not None:
             receptive_field_size = get_receptive_field_size(kernel_size, len(channel_sizes))
 
             if input_length > receptive_field_size:
-                warnings.warn(f"Input length ({input_length}) is larger than the receptive field size ({receptive_field_size}). Use get_kernel_size_and_layers({input_length}) to find the kernel size and number of layers that have a receptive field size closest to the input length.") 
+                warnings.warn(f"Input length ({input_length}) is larger than the receptive field size ({receptive_field_size}). Use get_kernel_size_and_layers({input_length}) to find the kernel size and number of layers that have a receptive field size closest to the input length.")
 
         tcn = TemporalConvNet(input_size,
-                            channel_sizes,
-                            kernel_size=kernel_size,
-                            dropout=dropout,
-                            dropout_mode=dropout_mode,
-                            batch_norm=batch_norm,
-                            weight_norm=weight_norm,
-                            bottleneck=bottleneck,
-                            groups=groups,
-                            residual=residual,
-                            force_downsample=force_downsample,
-                            zero_init_residual=zero_init_residual)
-        
+                              channel_sizes,
+                              kernel_size=kernel_size,
+                              dropout=dropout,
+                              dropout_mode=dropout_mode,
+                              batch_norm=batch_norm,
+                              weight_norm=weight_norm,
+                              bottleneck=bottleneck,
+                              groups=groups,
+                              residual=residual,
+                              force_downsample=force_downsample,
+                              zero_init_residual=zero_init_residual)
+
         if take_last_element:
             self.embedder = nn.Sequential(tcn, LastElement1d())
         else:
@@ -87,11 +87,15 @@ class TCN(nn.Module):
         """Forward pass of the TCN.
 
         Args:
-            inputs (torch.Tensor): Inputs into the TCN. Tensor should be of shape (N = batch size, C_in = input channels, L_in = input length).
+            inputs (torch.Tensor): Inputs into the TCN. Tensor should be of shape (N = batch size, C_in = input channels, L_in = input length)
+                                   or can be of shape (N = batch size, L_in = input length) if C_in = 1.
 
         Returns:
             torch.Tensor: Output of the TCN. Tensor will be of shape (N, C_out).
         """
+
+        if inputs.dim() == 2:
+            inputs = inputs.unsqueeze(1)
 
         out = self.embedder(inputs)
 
