@@ -5,7 +5,7 @@ import torch
 from torch import nn
 
 from tcn_lib.blocks import LastElement1d, TemporalConvNet
-from tcn_lib.stats import get_receptive_field_size
+from tcn_lib.stats import get_receptive_field_size, get_kernel_size_and_layers
 
 
 class TCN(nn.Module):
@@ -15,8 +15,8 @@ class TCN(nn.Module):
     def __init__(self,
                  input_size: int,
                  output_size: int,
-                 channel_sizes: List[Union[int, Tuple[int, int]]],
-                 kernel_size: Union[int, List[int]],
+                 channel_sizes: Union[List[Union[int, Tuple[int, int]]], int, Tuple[int, int]],
+                 kernel_size: Optional[Union[int, List[int]]] = None,
                  dropout: float = 0.0,
                  dropout_mode: str = 'standard',
                  batch_norm: bool = False,
@@ -51,8 +51,21 @@ class TCN(nn.Module):
 
         super(TCN, self).__init__()
 
-        # Make sure that also specifying one channel size per temporal layer works
-        channel_sizes = [channel_size if type(channel_size) is not int else (channel_size, channel_size) for channel_size in channel_sizes]
+        if kernel_size is None:
+            assert input_length is not None, "If kernel_size is not specified, input_length must be specified."
+            assert type(channel_sizes) is int or type(channel_sizes) is tuple, "If kernel_size is not specified but input_length is, channel_sizes must be an int or tuple of ints."
+
+            k, l = get_kernel_size_and_layers(input_length)
+
+            kernel_size = [k] * l
+
+        if type(channel_sizes) is int:
+            channel_sizes = [(channel_sizes, channel_sizes)] * len(kernel_size)
+        elif type(channel_sizes) is tuple:
+            channel_sizes = [channel_sizes] * len(kernel_size)
+        else:
+            # Make sure that also specifying one channel size per temporal layer works
+            channel_sizes = [channel_size if type(channel_size) is not int else (channel_size, channel_size) for channel_size in channel_sizes]
 
         if input_length is not None:
             receptive_field_size = get_receptive_field_size(kernel_size, len(channel_sizes))
