@@ -100,15 +100,11 @@ class TCN(nn.Module):
         """Forward pass of the TCN.
 
         Args:
-            inputs (torch.Tensor): Inputs into the TCN. Tensor should be of shape (N = batch size, C_in = input channels, L_in = input length)
-                                   or can be of shape (N = batch size, L_in = input length) if C_in = 1.
+            inputs (torch.Tensor): Inputs into the TCN. Tensor should be of shape (N = batch size, C_in = input channels, L_in = input length).
 
         Returns:
             torch.Tensor: Output of the TCN. Tensor will be of shape (N, C_out).
         """
-
-        if inputs.dim() == 2:
-            inputs = inputs.unsqueeze(1)
 
         out = self.embedder(inputs)
 
