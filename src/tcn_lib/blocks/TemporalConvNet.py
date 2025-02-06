@@ -61,8 +61,11 @@ class TemporalConvNet(nn.Sequential):
 
         for m in self.modules():
             if isinstance(m, nn.Conv1d):
+                # Initialize weights following Kaiming He's scheme
                 init_tcn_conv_weight(m)
             elif isinstance(m, nn.BatchNorm1d):
+                # Initialize BatchNorm following PyTorch's ResNet
+                # implementation: https://github.com/pytorch/vision/blob/0d68c7df8640abff43355afd57c494cf5d74f4a9/torchvision/models/resnet.py#L211
                 init_batch_norm(m)
 
         # Zero-initialize the last BN in each residual branch,
