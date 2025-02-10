@@ -26,6 +26,8 @@ class TemporalLayer(nn.Sequential):
                  use_weight_norm=False,
                  with_activation=True,
                  groups=1):
+        padding = padding if kernel_size != 1 else 0
+
         # We apply padding on both sides and remove the extra values on the right side
         # We could have also only applied padding on the left side like here:
         # https://github.com/locuslab/TCN/issues/8#issuecomment-384345206
@@ -36,7 +38,7 @@ class TemporalLayer(nn.Sequential):
                 kernel_size,
                 stride=stride,
                 padding=padding,
-                dilation=dilation,
+                dilation=dilation if kernel_size != 1 else 1,
                 groups=groups,
                 # Following:
                 # https://pytorch.org/tutorials/recipes/recipes/tuning_guide.html#disable-bias-for-convolutions-directly-followed-by-a-batch-norm

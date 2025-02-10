@@ -15,5 +15,8 @@ class Chomp1d(nn.Module):
         self.chomp_size = chomp_size
 
     def forward(self, x: torch.Tensor):
+        if self.chomp_size == 0:
+            return x
+
         # Cut off elements from the end of the sequence that extend beyond the input sequence length
         return x[:, :, :-self.chomp_size].contiguous()
