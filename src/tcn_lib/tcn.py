@@ -11,6 +11,7 @@ from tcn_lib.stats import get_receptive_field_size, get_kernel_size_and_layers
 class TCN(nn.Module):
 
     has_linear_layer: Final[bool]
+    transpose_input: Final[bool]
 
     def __init__(self,
                  input_size: int,
@@ -28,7 +29,8 @@ class TCN(nn.Module):
                  zero_init_residual: bool = False,
                  take_last_element: bool = True,
                  input_length: Optional[int] = None,
-                 crop_hidden_states: bool = False) -> None:
+                 crop_hidden_states: bool = False,
+                 transpose_input: bool = False):
         """Temporal Convolutional Network. Implementation based off of: 
         https://github.com/locuslab/TCN/blob/master/TCN/mnist_pixel/model.py.
 
@@ -49,6 +51,7 @@ class TCN(nn.Module):
             take_last_element (bool, optional): Whether to take the last element of the output. Defaults to True.
             input_length (Optional[int], optional): Length of the input; only used to check compatibility with the receptive field size. Defaults to None.
             crop_hidden_states (bool, optional): Whether to crop the hidden states to the minimum required length; requires input_length to be specified. Defaults to False.
+            transpose_input (bool, optional): Whether to transpose the input from (N, L_in, C_in) to (N, C_in, L_in). Defaults to False.
         """
 
         super(TCN, self).__init__()
@@ -110,15 +113,20 @@ class TCN(nn.Module):
         if self.has_linear_layer:
             self.fc = nn.Linear(channel_sizes[-1][1], output_size)
 
+        self.transpose_input = transpose_input
+
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
         """Forward pass of the TCN.
 
         Args:
-            inputs (torch.Tensor): Inputs into the TCN. Tensor should be of shape (N = batch size, C_in = input channels, L_in = input length).
+            inputs (torch.Tensor): Inputs into the TCN. Tensor should be of shape (N = batch size, C_in = input channels, L_in = input length) or (N, L_in, C_in) if transpose_input is True.
 
         Returns:
             torch.Tensor: Output of the TCN. Tensor will be of shape (N, C_out).
         """
+
+        if self.transpose_input:
+            inputs = inputs.transpose(1, 2)
 
         if self.pad_inputs:
             inputs = self.pad_inputs(inputs)
