@@ -4,9 +4,11 @@
 
 # TCN library (`tcn_lib`)
 
-This is a library for Temporal Convolutional Networks (TCNs) in PyTorch. It is based on the TCN as described in the paper [An Empirical Evaluation of Generic Convolutional and Recurrent Networks for Sequence Modeling](https://arxiv.org/abs/1803.01271) by Shaojie Bai, J. Zico Kolter and Vladlen Koltun. The code is largely based on the [original PyTorch implementation](https://github.com/locuslab/TCN) from the authors.
+This is a library for Temporal Convolutional Networks (TCNs) in PyTorch. It is based on the TCN as described in the [paper](https://arxiv.org/abs/1803.01271) _"An Empirical Evaluation of Generic Convolutional and Recurrent Networks for Sequence Modeling"_ by Shaojie Bai, J. Zico Kolter and Vladlen Koltun [[1]](#1). The code is largely based on the [original PyTorch implementation](https://github.com/locuslab/TCN) from the authors.
 
-Compared to the original code base, the following extra features were added:
+While we primarily adhere to the original TCN architecture, we introduce several modifications to incorporate techniques from modern deep convolutional residual networks (ResNets) into TCNs. Instead of the originally proposed weight normalization [[2]](#2), we apply batch normalization [[3]](#3) after each convolutional layer, as we found it consistently improves performance across tasks. We initialize convolutional weights using the method from [[4]](#4), designed for ReLU-activated networks and successfully applied in ResNets [[5]](#5). Following [[6]](#6), we zero-initialize the last batch normalization scaling coefficient $\gamma$ in each residual block to ensure information propagation through the identity connections at the start of training. All other batch normalization scales are set to 1, and biases to 0, a standard practice in deep learning frameworks.
+
+Overall, compared to the original code base, the following extra features were added:
 
 - Support for batch normalization or/and weight normalization
 - Possible to disable residual connections
@@ -110,6 +112,26 @@ plt.show()
 ```
 
 ![Graph of a TCN with kernel size 5 and 2 layers](docs/img/tcn_k5_l2.png)
+
+## References
+<a id="1">[1]</a> 
+S. Bai, J. Z. Kolter, and V. Koltun, “An empirical evaluation of generic convolutional and recurrent networks for sequence modeling,”
+vol. arXiv 1803.01271, 2018. [Online]. Available: http://arxiv.org/abs/1803.01271
+
+<a id="2">[2]</a> 
+T. Salimans and D. P. Kingma, “Weight normalization: A simple reparameterization to accelerate training of deep neural networks,” _Advances in neural information processing systems_, vol. 29, 2016.
+
+<a id="3">[3]</a> 
+S. Ioffe and C. Szegedy, “Batch normalization: Accelerating deep network training by reducing internal covariate shift,“ 2015. arXiv: 1502 . 03167 [cs.LG]. [Online]. Available: https://arxiv.org/abs/1502.03167.
+
+<a id="4">[4]</a> 
+K. He, X. Zhang, S. Ren, and J. Sun, “Delving deep into rectifiers: Surpassing human-level performance on imagenet classification,” in _Proceedings of the IEEE international conference on computer vision_, 2015, pp. 1026–1034.
+
+<a id="5">[5]</a> 
+K. He, X. Zhang, S. Ren, and J. Sun, “Deep residual learning for image recognition,” 2015. arXiv: 1512 . 03385 [cs.CV]. [Online]. Available: https://arxiv.org/ abs/1512.03385.
+
+<a id="6">[6]</a> 
+P. Goyal, “Accurate, large minibatch sgd: Training imagenet in 1 hour,” arXiv preprint arXiv:1706.02677, 2017.
 
 ## License
 
