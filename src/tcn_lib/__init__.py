@@ -1,1 +1,1 @@
-from tcn_lib.TCN import TCN
+from tcn_lib.tcn import TCN
