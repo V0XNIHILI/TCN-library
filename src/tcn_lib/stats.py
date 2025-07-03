@@ -26,6 +26,7 @@ def get_receptive_field_size(kernel_size: Union[int, List[int]],
         for l in range(1,num_layers+1)
     ]) + 1
 
+
 def get_kernel_size_and_layers(required_receptive_field_size: int, kernel_sizes: List[int] = [3,5,7,9], dilation_exponential_base: int = 2):
     """Get the configuration of kernel size and number of layers that has a receptive field size closest
     (but always larger) than the required receptive field size.
@@ -65,11 +66,11 @@ def get_kernel_size_and_layers(required_receptive_field_size: int, kernel_sizes:
     return configuration
 
 
-def create_graph(kernel_size: int, num_layers: int, input_size: Union[int, None] = None, colors: Tuple[str, str] = None, keep_ancestors_only: bool = False):
+def create_graph(kernel_size: Union[int, List[int]], num_layers: int, input_size: Union[int, None] = None, colors: Tuple[str, str] = None, keep_ancestors_only: bool = False):
     """Create computation graph of a TCN network. Assumes the structure of the TCN as proposed by Bai et al.
 
     Args:
-        kernel_size (int): Size of the kernel
+        kernel_size (Union[int, List[int]]): Size of the kernel(s).
         num_layers (int): Total number of layers in a TCN
         input_size (Union[int, None], optional): Maximum length of sequence as input into the TCN. Defaults to None.
         colors (Tuple[str, str], optional): Tuple of colors to use for the graph (base color, ancestor color). Defaults to None.
@@ -120,7 +121,7 @@ def create_graph(kernel_size: int, num_layers: int, input_size: Union[int, None]
 
                 dilation = 2**((j + 1) // 2 - 1)
 
-                for k in range(1, kernel_size):
+                for k in range(1, kernel_size[(j-1)//2] if isinstance(kernel_size, list) else kernel_size):
                     if i - k * dilation >= 0:
                         G.add_edge((i - k * dilation, j - 1), (i, j))
 
@@ -151,9 +152,20 @@ if __name__ == "__main__":
     import networkx as nx
 
     k = 3
-    total_layers = 3
+    total_layers = 2
 
-    G, pos, color_map = create_graph(k, total_layers, keep_ancestors_only=False)
+    G, pos, color_map = create_graph(k, total_layers, keep_ancestors_only=True)
+
+    # Get all nodes with i = 0
+    nodes = [node for node in G.nodes if node[1] == 0]
+
+    # Count number of edges
+    num_edges = 0
+
+    for node in G.nodes:
+        num_edges += len(list(G.successors(node)))
+
+    print(f"Number of edges: {num_edges}")
 
     plt.figure(figsize=(10, 5))
     nx.draw(G, pos, with_labels=False, font_size=7, node_color=color_map, node_size=90)  #, node_size=30)
