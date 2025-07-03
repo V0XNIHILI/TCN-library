@@ -11,6 +11,7 @@ import torch.nn as nn
 from tcn_lib.blocks import TemporalBlock, TemporalBottleneck
 from tcn_lib.utils import init_tcn_conv_weight, init_batch_norm
 
+
 class TemporalConvNet(nn.Sequential):
 
     def __init__(self,
@@ -18,14 +19,15 @@ class TemporalConvNet(nn.Sequential):
                  num_channels: List[Tuple[int, int]],
                  kernel_size: Union[int, List[int]],
                  dropout=0.2,
-                 dropout_mode='standard',
-                 batch_norm=False,
-                 weight_norm=False,
-                 bottleneck=False,
-                 groups=1,
-                 residual=True,
-                 force_downsample=False,
-                 zero_init_residual=False):
+                 dropout_mode: str = 'standard',
+                 batch_norm: bool = False,
+                 weight_norm: bool = False,
+                 bottleneck: bool = False,
+                 groups: int = 1,
+                 residual: bool = True,
+                 force_downsample: bool = False,
+                 zero_init_residual: bool = False,
+                 crop_hidden_states: bool =False):
         if zero_init_residual == True and not batch_norm:
             raise ValueError(
                 "To use zero_init_residual, batch_norm has to be set to True."
@@ -35,19 +37,29 @@ class TemporalConvNet(nn.Sequential):
 
         Block = TemporalBottleneck if bottleneck else TemporalBlock
 
-        for i in range(len(num_channels)):
-            dilation_size = 2**i
+        if crop_hidden_states == True:
+            assert not bottleneck, "Bottleneck layers are not supported when crop_hidden_states is set to True."
 
+        for i in range(len(num_channels)):
             in_channels = num_inputs if i == 0 else num_channels[i - 1][1]
             block_kernel_size = kernel_size[i] if isinstance(kernel_size, list) else kernel_size
+            
+            if crop_hidden_states:
+                dilation_size = 1
+                padding = 0
+                stride = (1, 2)
+            else:
+                dilation_size = 2**i
+                padding = (block_kernel_size - 1) * dilation_size
+                stride = (1, 1)
 
             layers += [
                 Block(in_channels,
                       num_channels[i],
                       block_kernel_size,
-                      stride=1,
+                      stride=stride,
                       dilation=dilation_size,
-                      padding=(block_kernel_size - 1) * dilation_size,
+                      padding=padding,
                       dropout=dropout,
                       dropout_mode=dropout_mode,
                       batch_norm=batch_norm,

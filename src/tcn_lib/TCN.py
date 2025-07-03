@@ -27,7 +27,8 @@ class TCN(nn.Module):
                  force_downsample: bool = False,
                  zero_init_residual: bool = False,
                  take_last_element: bool = True,
-                 input_length: Optional[int] = None):
+                 input_length: Optional[int] = None,
+                 crop_hidden_states: bool = False) -> None:
         """Temporal Convolutional Network. Implementation based off of: 
         https://github.com/locuslab/TCN/blob/master/TCN/mnist_pixel/model.py.
 
@@ -47,6 +48,7 @@ class TCN(nn.Module):
             zero_init_residual (bool, optional): Whether to zero initialize the residual connections (per: https://arxiv.org/abs/1706.0267). Defaults to False.
             take_last_element (bool, optional): Whether to take the last element of the output. Defaults to True.
             input_length (Optional[int], optional): Length of the input; only used to check compatibility with the receptive field size. Defaults to None.
+            crop_hidden_states (bool, optional): Whether to crop the hidden states to the minimum required length; requires input_length to be specified. Defaults to False.
         """
 
         super(TCN, self).__init__()
@@ -67,11 +69,22 @@ class TCN(nn.Module):
             # Make sure that also specifying one channel size per temporal layer works
             channel_sizes = [channel_size if type(channel_size) is not int else (channel_size, channel_size) for channel_size in channel_sizes]
 
+        self.pad_inputs = None
+
+        if crop_hidden_states:
+            assert input_length is not None, "If crop_hidden_states is set to True, input_length must be specified."
+            assert take_last_element is True, "Cropping the hidden states only works when the last element is taken. Set take_last_element to True."
+
         if input_length is not None:
             receptive_field_size = get_receptive_field_size(kernel_size, len(channel_sizes))
 
             if input_length > receptive_field_size:
                 warnings.warn(f"Input length ({input_length}) is larger than the receptive field size ({receptive_field_size}). Use get_kernel_size_and_layers({input_length}) to find the kernel size and number of layers that have a receptive field size closest to the input length.")
+
+            if crop_hidden_states:
+                padding = receptive_field_size - input_length
+
+                self.pad_inputs = nn.ZeroPad1d((padding, 0))
 
         tcn = TemporalConvNet(input_size,
                               channel_sizes,
@@ -84,7 +97,8 @@ class TCN(nn.Module):
                               groups=groups,
                               residual=residual,
                               force_downsample=force_downsample,
-                              zero_init_residual=zero_init_residual)
+                              zero_init_residual=zero_init_residual,
+                              crop_hidden_states=crop_hidden_states)
 
         if take_last_element:
             self.embedder = nn.Sequential(tcn, LastElement1d())
@@ -105,6 +119,9 @@ class TCN(nn.Module):
         Returns:
             torch.Tensor: Output of the TCN. Tensor will be of shape (N, C_out).
         """
+
+        if self.pad_inputs:
+            inputs = self.pad_inputs(inputs)
 
         out = self.embedder(inputs)
 

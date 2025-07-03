@@ -9,6 +9,7 @@ class PointwiseLayer(nn.Sequential):
     def __init__(self,
                  in_channels: int,
                  out_channels: int,
+                 stride: int,
                  dropout=0.2,
                  batch_norm: bool = False,
                  dropout_mode='standard',
@@ -19,7 +20,8 @@ class PointwiseLayer(nn.Sequential):
             nn.Conv1d(
                 in_channels,
                 out_channels,
-                1,
+                kernel_size=1,
+                stride=stride,
                 # Following: https://pytorch.org/tutorials/recipes/recipes/tuning_guide.html#disable-bias-for-convolutions-directly-followed-by-a-batch-norm
                 bias=with_bias and not batch_norm))
         normalize = nn.BatchNorm1d(
