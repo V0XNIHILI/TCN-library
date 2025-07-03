@@ -134,6 +134,9 @@ class TCN(nn.Module):
         out = self.embedder(inputs)
 
         if self.has_linear_layer:
+            if len(out.shape) == 3:
+                out = out.transpose(1, 2) # nn.Linear expects the last dimension to be the channel dimension, currently that is the sequence length dimension
+    
             out = self.fc(out)
 
         return out
