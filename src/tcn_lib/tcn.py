@@ -134,9 +134,18 @@ class TCN(nn.Module):
         out = self.embedder(inputs)
 
         if self.has_linear_layer:
+            og_shape = None
+            
             if len(out.shape) == 3:
-                out = out.transpose(1, 2) # nn.Linear expects the last dimension to be the channel dimension, currently that is the sequence length dimension
+                # out shape = (N, C_out, L_out)
+                og_shape = out.shape
+                # out shape = (N * L_out, C_out), since nn.Linear expects the last dimension to be the channel dimension, currently that is the sequence length dimension
+                out = out.view(-1, out.shape[1])
     
             out = self.fc(out)
+
+            if og_shape is not None:
+                # Reshape back to (N, C_out, L_out) for CE loss, which expects (N, C, ...)
+                out = out.view(*og_shape)
 
         return out
