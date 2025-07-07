@@ -145,7 +145,8 @@ class TCN(nn.Module):
             out = self.fc(out)
 
             if og_shape is not None:
-                # Reshape back to (N, C_out, L_out) for CE loss, which expects (N, C, ...)
-                out = out.view(*og_shape)
+                n, _, l = og_shape
+                # Reshape back to (N, C_out_fc, L_out) for CE loss, which expects (N, C, ...)
+                out = out.view(n, -1, l)
 
         return out
