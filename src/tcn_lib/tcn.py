@@ -12,6 +12,7 @@ class TCN(nn.Module):
 
     has_linear_layer: Final[bool]
     transpose_input: Final[bool]
+    take_last_element: Final[bool]
 
     def __init__(self,
                  input_size: int,
@@ -114,6 +115,7 @@ class TCN(nn.Module):
             self.fc = nn.Linear(channel_sizes[-1][1], output_size)
 
         self.transpose_input = transpose_input
+        self.take_last_element = take_last_element
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
         """Forward pass of the TCN.
@@ -134,7 +136,7 @@ class TCN(nn.Module):
         out = self.embedder(inputs)
 
         if self.has_linear_layer:
-            if len(out.shape) == 3:
+            if not self.take_last_element:
                 # out shape = (N, C_out, L_out) -> (N * L_out, C_out), since nn.Linear expects the last dimension to be the channel dimension, currently that is the sequence length dimension
                 out = out.view(-1, out.shape[1])
     
