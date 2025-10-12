@@ -12,6 +12,8 @@ import torch.nn as nn
 from tcn_lib.blocks.PointwiseLayer import PointwiseLayer
 from tcn_lib.blocks.TemporalLayer import TemporalLayer
 
+from tcn_lib.utils import select_act_fn
+
 
 class TemporalBlock(nn.Module):
 
@@ -26,6 +28,7 @@ class TemporalBlock(nn.Module):
                  dropout_mode: str = 'standard',
                  batch_norm: bool = False,
                  weight_norm: bool = False,
+                 act_fn: str = 'relu',
                  groups: int = 1,
                  residual: bool = True,
                  force_downsample: bool = False):
@@ -42,11 +45,11 @@ class TemporalBlock(nn.Module):
         self.temp_layer1 = TemporalLayer(n_inputs, n_intermediates,
                                          kernel_size, stride[0], dilation,
                                          padding, dropout, dropout_mode, batch_norm,
-                                         weight_norm, True, n_inputs if groups == -1 else groups)
+                                         weight_norm, act_fn, n_inputs if groups == -1 else groups)
         self.temp_layer2 = TemporalLayer(n_intermediates, n_outputs,
                                          kernel_size, stride[1], dilation, padding,
                                          dropout, dropout_mode, batch_norm, weight_norm,
-                                         False, n_intermediates if groups == -1 else groups)
+                                         None, n_intermediates if groups == -1 else groups)
 
         if requires_downsample:
             # No bias needed in this layer as the bias of temp_layer2 will have the same effect
@@ -57,7 +60,7 @@ class TemporalBlock(nn.Module):
         else:
             self.downsample = None
 
-        self.relu = nn.ReLU(inplace=True)
+        self.act_fn = select_act_fn(act_fn)
 
     def forward(self, x: torch.Tensor):
         out = self.temp_layer1(x)
@@ -82,6 +85,6 @@ class TemporalBlock(nn.Module):
         
             out += res
 
-        out = self.relu(out)
+        out = self.act_fn(out)
 
         return out

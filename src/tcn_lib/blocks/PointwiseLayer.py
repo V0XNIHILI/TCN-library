@@ -1,7 +1,9 @@
+from typing import Optional
+
 import torch.nn as nn
 from torch.nn.utils.parametrizations import weight_norm
 
-from tcn_lib.utils import conditional_apply
+from tcn_lib.utils import conditional_apply, select_act_fn
 
 
 class PointwiseLayer(nn.Sequential):
@@ -14,7 +16,7 @@ class PointwiseLayer(nn.Sequential):
                  batch_norm: bool = False,
                  dropout_mode='standard',
                  use_weight_norm=False,
-                 with_activation=True,
+                 act_fn: Optional[str] = 'relu',
                  with_bias=False):
         conv = conditional_apply(weight_norm, use_weight_norm)(
             nn.Conv1d(
@@ -26,7 +28,7 @@ class PointwiseLayer(nn.Sequential):
                 bias=with_bias and not batch_norm))
         normalize = nn.BatchNorm1d(
             out_channels) if batch_norm else nn.Identity()
-        relu = nn.ReLU(inplace=True) if with_activation else nn.Identity()
+        act_fn = select_act_fn(act_fn)
         dropout = (nn.Dropout1d if dropout_mode == '1d' else nn.Dropout)(dropout) if dropout > 0 else nn.Identity()
 
-        super(PointwiseLayer, self).__init__(conv, normalize, relu, dropout)
+        super(PointwiseLayer, self).__init__(conv, normalize, act_fn, dropout)

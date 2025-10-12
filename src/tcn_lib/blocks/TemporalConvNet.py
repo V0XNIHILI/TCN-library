@@ -22,6 +22,7 @@ class TemporalConvNet(nn.Sequential):
                  dropout_mode: str = 'standard',
                  batch_norm: bool = False,
                  weight_norm: bool = False,
+                 act_fn: str = 'relu',
                  bottleneck: bool = False,
                  groups: int = 1,
                  residual: bool = True,
@@ -64,6 +65,7 @@ class TemporalConvNet(nn.Sequential):
                       dropout_mode=dropout_mode,
                       batch_norm=batch_norm,
                       weight_norm=weight_norm,
+                      act_fn=act_fn,
                       groups=groups,
                       residual=residual,
                       force_downsample=force_downsample)

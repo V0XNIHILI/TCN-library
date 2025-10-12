@@ -4,11 +4,13 @@ https://github.com/locuslab/TCN/blob/2f8c2b817050206397458d
 fd1f5a25ce8a32fe65/TCN/tcn.py.
 """
 
+from typing import Optional
+
 import torch.nn as nn
 from torch.nn.utils.parametrizations import weight_norm
 
 from tcn_lib.blocks.Chomp1d import Chomp1d
-from tcn_lib.utils import conditional_apply
+from tcn_lib.utils import conditional_apply, select_act_fn
 
 
 class TemporalLayer(nn.Sequential):
@@ -24,7 +26,7 @@ class TemporalLayer(nn.Sequential):
                  dropout_mode='standard',
                  batch_norm=False,
                  use_weight_norm=False,
-                 with_activation=True,
+                 act_fn: Optional[str] = 'relu',
                  groups=1):
         padding = padding if kernel_size != 1 else 0
 
@@ -45,9 +47,9 @@ class TemporalLayer(nn.Sequential):
                 bias=not batch_norm))
         chomp = Chomp1d(padding)
         normalize = nn.BatchNorm1d(n_outputs) if batch_norm else nn.Identity()
-        relu = nn.ReLU(inplace=True) if with_activation else nn.Identity()
+        act_fn = select_act_fn(act_fn)
         dropout = (nn.Dropout1d if dropout_mode == '1d' else nn.Dropout)(dropout) if dropout > 0 else nn.Identity()
 
-        super(TemporalLayer, self).__init__(conv, normalize, chomp, relu,
+        super(TemporalLayer, self).__init__(conv, normalize, chomp, act_fn,
                                             dropout)
 

@@ -6,6 +6,8 @@ import torch.nn as nn
 from tcn_lib.blocks.PointwiseLayer import PointwiseLayer
 from tcn_lib.blocks.TemporalLayer import TemporalLayer
 
+from tcn_lib.utils import select_act_fn
+
 
 class TemporalBottleneck(nn.Module):
 
@@ -20,6 +22,7 @@ class TemporalBottleneck(nn.Module):
                  dropout_mode='standard',
                  batch_norm=False,
                  weight_norm=False,
+                 act_fn: str = 'relu',
                  groups=1,
                  residual=True,
                  force_downsample=False):
@@ -39,19 +42,19 @@ class TemporalBottleneck(nn.Module):
         self.residual = residual
 
         self.temp_layer1 = PointwiseLayer(n_inputs, n_intermediates, 1, dropout, dropout_mode,
-                                          batch_norm, weight_norm, True, True)
+                                          batch_norm, weight_norm, act_fn, True)
         self.temp_layer2 = TemporalLayer(n_intermediates, n_intermediates,
                                          kernel_size, stride, dilation,
                                          padding, dropout, dropout_mode, batch_norm,
-                                         weight_norm, True, n_intermediates if groups == -1 else groups)
+                                         weight_norm, act_fn, n_intermediates if groups == -1 else groups)
         self.temp_layer3 = PointwiseLayer(n_intermediates, n_outputs, 1, dropout, dropout_mode,
-                                          batch_norm, weight_norm, False, True)
+                                          batch_norm, weight_norm, None, True)
 
         self.downsample = PointwiseLayer(
             n_inputs, n_outputs, 1, dropout, dropout_mode, batch_norm, weight_norm,
             False, False) if requires_downsample else None
 
-        self.relu = nn.ReLU(inplace=True)
+        self.act_fn = select_act_fn(act_fn)
 
     def forward(self, x: torch.Tensor):
         res = x
@@ -66,6 +69,6 @@ class TemporalBottleneck(nn.Module):
 
             out += res
 
-        out = self.relu(out)
+        out = self.act_fn(out)
 
         return out
