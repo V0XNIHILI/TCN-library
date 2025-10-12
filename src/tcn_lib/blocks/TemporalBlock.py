@@ -56,7 +56,7 @@ class TemporalBlock(nn.Module):
             self.downsample = PointwiseLayer(
                 n_inputs, n_outputs, stride[1],
                 dropout, batch_norm, weight_norm,
-                False, False)
+                act_fn=None, False)
         else:
             self.downsample = None
 

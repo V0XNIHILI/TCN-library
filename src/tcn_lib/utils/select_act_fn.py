@@ -14,4 +14,4 @@ def select_act_fn(act: Optional[str]) -> nn.Module:
     elif act == 'silu':
         return nn.SiLU(inplace=True)
     else:
-        raise ValueError(f"Unsupported activation function: {act}. Supported values are 'relu', 'gelu', 'silu', and None.")
+        raise ValueError(f"Unsupported activation function: {act}. Supported values are 'relu', 'gelu', 'silu', and None but got {act}.")
