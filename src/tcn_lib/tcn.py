@@ -10,7 +10,6 @@ from tcn_lib.stats import get_receptive_field_size, get_kernel_size_and_layers
 
 class TCN(nn.Module):
 
-    has_linear_layer: Final[bool]
     transpose_input: Final[bool]
     take_last_element: Final[bool]
 
@@ -111,9 +110,7 @@ class TCN(nn.Module):
         else:
             self.embedder = tcn
 
-        self.has_linear_layer = output_size != -1
-
-        if self.has_linear_layer:
+        if output_size != -1:
             self.fc = nn.Linear(channel_sizes[-1][1], output_size)
 
         self.transpose_input = transpose_input
@@ -137,14 +134,11 @@ class TCN(nn.Module):
 
         out = self.embedder(inputs)
 
-        if self.has_linear_layer:
+        if hasattr(self, "fc"):
             if not self.take_last_element:
                 # out shape = (N, C_out, L_out) -> (N, L_out, C_out), since nn.Linear expects the last dimension to be the channel dimension, currently that is the sequence length dimension
                 out = out.transpose(1,2)
     
             out = self.fc(out)
-
-            if not self.take_last_element:
-                out = out.transpose(1,2)
 
         return out
