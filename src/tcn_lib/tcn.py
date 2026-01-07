@@ -139,9 +139,12 @@ class TCN(nn.Module):
 
         if self.has_linear_layer:
             if not self.take_last_element:
-                # out shape = (N, C_out, L_out) -> (N * L_out, C_out), since nn.Linear expects the last dimension to be the channel dimension, currently that is the sequence length dimension
-                out = out.view(-1, out.shape[1])
+                # out shape = (N, C_out, L_out) -> (N, L_out, C_out), since nn.Linear expects the last dimension to be the channel dimension, currently that is the sequence length dimension
+                out = out.transpose(1,2)
     
             out = self.fc(out)
+
+            if not self.take_last_element:
+                out = out.transpose(1,2)
 
         return out
