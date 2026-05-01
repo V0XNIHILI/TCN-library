@@ -12,6 +12,7 @@ class TCN(nn.Module):
 
     transpose_input: Final[bool]
     take_last_element: Final[bool]
+    cut_n_elements_of_last_layer: Final[int]
 
     def __init__(self,
                  input_size: int,
@@ -31,7 +32,8 @@ class TCN(nn.Module):
                  take_last_element: bool = True,
                  input_length: Optional[int] = None,
                  crop_hidden_states: bool = False,
-                 transpose_input: bool = False):
+                 transpose_input: bool = False,
+                 pre_pad_with_receptive_field: bool = False):
         """Temporal Convolutional Network. Implementation based off of: 
         https://github.com/locuslab/TCN/blob/master/TCN/mnist_pixel/model.py.
 
@@ -53,6 +55,7 @@ class TCN(nn.Module):
             input_length (Optional[int], optional): Length of the input; only used to check compatibility with the receptive field size. Defaults to None.
             crop_hidden_states (bool, optional): Whether to crop the hidden states to the minimum required length; requires input_length to be specified. Defaults to False.
             transpose_input (bool, optional): Whether to transpose the input from (N, L_in, C_in) to (N, C_in, L_in). Defaults to False.
+            pre_pad_with_receptive_field (bool, optional): Whether to pad the input with the receptive field size before the first layer. Necessary during FP32 pre-training to have bit-wise matching results with the Chameleon chip. Defaults to False.
         """
 
         super(TCN, self).__init__()
@@ -79,9 +82,10 @@ class TCN(nn.Module):
             assert input_length is not None, "If crop_hidden_states is set to True, input_length must be specified."
             assert take_last_element is True, "Cropping the hidden states only works when the last element is taken. Set take_last_element to True."
 
-        if input_length is not None:
-            receptive_field_size = get_receptive_field_size(kernel_size, len(channel_sizes))
 
+        receptive_field_size = get_receptive_field_size(kernel_size, len(channel_sizes))
+
+        if input_length is not None:
             if input_length > receptive_field_size:
                 warnings.warn(f"Input length ({input_length}) is larger than the receptive field size ({receptive_field_size}). Use get_kernel_size_and_layers({input_length}) to find the kernel size and number of layers that have a receptive field size closest to the input length.")
 
@@ -89,6 +93,10 @@ class TCN(nn.Module):
                 padding = receptive_field_size - input_length
 
                 self.pad_inputs = nn.ZeroPad1d((padding, 0))
+        
+        if pre_pad_with_receptive_field:
+            assert self.pad_inputs is None, "Cannot pre-pad with receptive field if crop_hidden_states is True. Set crop_hidden_states to False or pre_pad_with_receptive_field to False."
+            self.pad_inputs = nn.ZeroPad1d((receptive_field_size, 0))
 
         tcn = TemporalConvNet(input_size,
                               channel_sizes,
@@ -115,6 +123,7 @@ class TCN(nn.Module):
 
         self.transpose_input = transpose_input
         self.take_last_element = take_last_element
+        self.cut_n_elements_of_last_layer = receptive_field_size if pre_pad_with_receptive_field else 0
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
         """Forward pass of the TCN.
@@ -140,5 +149,8 @@ class TCN(nn.Module):
                 out = out.transpose(1,2)
     
             out = self.fc(out)
+
+        if self.cut_n_elements_of_last_layer != 0:
+            out = out[:, self.cut_n_elements_of_last_layer:, :]
 
         return out
