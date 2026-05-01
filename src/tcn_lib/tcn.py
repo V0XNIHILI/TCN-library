@@ -123,7 +123,7 @@ class TCN(nn.Module):
 
         self.transpose_input = transpose_input
         self.take_last_element = take_last_element
-        self.cut_n_elements_of_last_layer = receptive_field_size if pre_pad_with_receptive_field else 0
+        self.cut_n_elements_of_last_layer = receptive_field_size if pre_pad_with_receptive_field and not take_last_element else 0
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
         """Forward pass of the TCN.
